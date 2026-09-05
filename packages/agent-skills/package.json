@@ -1,0 +1,15 @@
+{
+  "name": "@ultra-omp/agent-skills",
+  "version": "0.1.0",
+  "description": "Native OMP engineering workflow skills, lifecycle commands, and personas",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/nntoan/ultra-omp.git", "directory": "packages/agent-skills" },
+  "bugs": { "url": "https://github.com/nntoan/ultra-omp/issues" },
+  "homepage": "https://github.com/nntoan/ultra-omp/tree/main/packages/agent-skills",
+  "type": "module",
+  "scripts": { "test": "bun test test && bun test ./scripts/lib/skill-lint-test.js", "check": "bun test test && bun test ./scripts/lib/skill-lint-test.js && bun scripts/validate-skills.js" },
+  "publishConfig": { "access": "public" },
+  "omp": { "extensions": ["./extensions/index.ts"] },
+  "peerDependencies": { "@earendil-works/pi-coding-agent": "*" },
+  "files": ["extensions/", "skills/", "commands/", "agents/", "references/", "README.md", "LICENSE"]
+}
