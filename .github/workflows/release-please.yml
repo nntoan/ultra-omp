@@ -1,0 +1,40 @@
+name: Release Please
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    outputs:
+      paths_released: ${{ steps.release.outputs.paths_released }}
+    steps:
+      - id: release
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+  publish:
+    needs: release
+    if: ${{ needs.release.outputs.paths_released != '[]' && needs.release.outputs.paths_released != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.0
+      - run: bun install --frozen-lockfile
+      - run: bun run check
+      - run: npm install --global npm@11.5.1
+      - name: Publish released packages
+        env:
+          PATHS_RELEASED: ${{ needs.release.outputs.paths_released }}
+        run: |
+          node -e 'for (const p of JSON.parse(process.env.PATHS_RELEASED)) if (/^packages\/[^/]+$/.test(p)) require("child_process").execFileSync("npm", ["publish", p, "--access", "public"], {stdio:"inherit"})'
