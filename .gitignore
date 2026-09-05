@@ -1,0 +1,10 @@
+node_modules/
+coverage/
+*.tgz
+docs/.vitepress/dist/
+docs/public/install
+*.tar.gz
+
+## Agentic
+.codegraph/
+.gitnexus/

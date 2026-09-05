@@ -1,0 +1,10 @@
+{
+  "release-type": "node",
+  "include-component-in-tag": true,
+  "packages": {
+    "packages/agent-skills": { "component": "agent-skills" },
+    "packages/pi-reasonix": { "component": "pi-reasonix" },
+    "packages/pi-deepseek-cache": { "component": "pi-deepseek-cache" },
+    "packages/installer": { "component": "ultra-omp" }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "ultra-omp",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Native OMP extension suite",
+  "packageManager": "bun@1.4.0",
+  "workspaces": ["packages/agent-skills", "packages/pi-reasonix", "packages/pi-deepseek-cache", "packages/installer"],
+  "repository": { "type": "git", "url": "https://github.com/nntoan/ultra-omp.git" },
+  "scripts": {
+    "test": "bun --filter '*' test",
+    "check": "bun run validate:skills && bun run check:installer-catalog && bun run docs:build && bun --filter '*' check",
+    "validate:skills": "bun packages/agent-skills/scripts/validate-skills.js",
+    "sync:installer-catalog": "node scripts/sync-installer-catalog.mjs",
+    "check:installer-catalog": "node scripts/sync-installer-catalog.mjs --check",
+    "sync:docs-install": "node scripts/sync-docs-install.mjs",
+    "check:docs-install": "node scripts/sync-docs-install.mjs --check",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "bun run sync:docs-install && vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "pack:check": "for p in packages/*; do (cd \"$p\" && npm pack --dry-run); done"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}
