@@ -33,23 +33,24 @@
  * prefix (deepseek-*) or provider name (deepseek). No provider names are
  * hardcoded. Non-DeepSeek models pass through unchanged.
  *
- * Install: pi install npm:@rohaquinlop/pi-deepseek-cache
+ * Install: omp plugin install @ultra-omp/pi-deepseek-cache
  */
 
-import { complete } from "@earendil-works/pi-ai";
+import { complete } from "@oh-my-pi/pi-ai";
 import type {
   ExtensionAPI,
   ExtensionContext,
-} from "@earendil-works/pi-coding-agent";
+} from "@oh-my-pi/pi-coding-agent";
 import {
   convertToLlm,
+  getAgentDir,
   serializeConversation,
-} from "@earendil-works/pi-coding-agent";
+} from "@oh-my-pi/pi-coding-agent";
 import {
   matchesKey,
   visibleWidth,
   type Focusable,
-} from "@earendil-works/pi-tui";
+} from "@oh-my-pi/pi-tui";
 import { createHash } from "node:crypto";
 import {
   existsSync,
@@ -61,7 +62,6 @@ import {
   writeFileSync,
 } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
-import { homedir } from "node:os";
 import { join } from "node:path";
 import {
   isDeepSeekModel,
@@ -85,13 +85,8 @@ import {
 // Constants
 // ═══════════════════════════════════════════════════════════════════════════
 
-const STATS_DIR = join(
-  homedir(),
-  ".pi",
-  "agent",
-  "extensions",
-  "deepseek-cache",
-);
+const OMP_AGENT_DIR = getAgentDir();
+const STATS_DIR = join(OMP_AGENT_DIR, "extensions", "deepseek-cache");
 const SUMMARY_CACHE_FILE = join(STATS_DIR, "summary-cache.json");
 
 const SUMMARY_MAX_TOKENS = 8192;
@@ -231,9 +226,7 @@ function evictSummaryCacheIfNeeded(cache: Map<string, string>): void {
   }
 }
 
-/**
- * Delete stats-*.json and history-*.json files older than 30 days.
- */
+/** Delete stats-*.json and history-*.json files older than 30 days. */
 function cleanupOldSessions() {
   try {
     if (!existsSync(STATS_DIR)) return;

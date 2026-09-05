@@ -10,7 +10,17 @@
   "homepage": "https://github.com/nntoan/ultra-omp/tree/main/packages/pi-deepseek-cache",
   "files": ["extensions/", "lib/", "README.md", "LICENSE"],
   "omp": { "extensions": ["./extensions/index.ts"] },
-  "peerDependencies": { "@earendil-works/pi-ai": "*", "@earendil-works/pi-coding-agent": "*", "@earendil-works/pi-tui": "*" },
+  "peerDependencies": {
+    "@oh-my-pi/pi-ai": "*",
+    "@oh-my-pi/pi-coding-agent": "*",
+    "@oh-my-pi/pi-tui": "*"
+  },
   "scripts": { "test": "vitest run", "check": "vitest run" },
-  "devDependencies": { "vitest": "^3.2.0" }
+  "devDependencies": {
+    "@oh-my-pi/pi-ai": "*",
+    "@oh-my-pi/pi-coding-agent": "*",
+    "@oh-my-pi/pi-tui": "*",
+    "@types/node": "^22.14.0",
+    "vitest": "^3.2.0"
+  }
 }

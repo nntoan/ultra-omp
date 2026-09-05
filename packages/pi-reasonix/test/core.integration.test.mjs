@@ -69,7 +69,10 @@ async function loadExtension() {
   const { api, captured } = createMockAPI();
   const ext = (await import("../dist/extensions/index.js")).default;
   await ext(api);
-  api._handlers.get("model_select")({ model: { id: "deepseek-chat" } });
+  await api._handlers.get("session_start")({}, { model: { id: "deepseek-chat" } });
+  api._handlers.get("before_provider_request")({
+    payload: { model: "deepseek-chat", messages: [] },
+  });
   return { api, captured };
 }
 

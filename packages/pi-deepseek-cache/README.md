@@ -18,7 +18,7 @@
 
 DeepSeek's API uses [prefix caching](https://api-docs.deepseek.com/guides/kv_cache/) — identical prompt prefixes served from disk cache at **50–120× lower cost** than fresh computation. But the cache only works when every byte from position 0 is identical across requests.
 
-Pi's default system prompt embeds `Current date: YYYY-MM-DD` and `Current working directory: <cwd>` — dynamic values that change daily and per session, silently busting the entire prefix cache.
+OMP's system prompt embeds `Current date: YYYY-MM-DD` and `Current working directory: <cwd>` — dynamic values that change daily and per session, silently busting the entire prefix cache.
 
 ## What This Extension Does
 
@@ -41,19 +41,11 @@ Pi's default system prompt embeds `Current date: YYYY-MM-DD` and `Current workin
 ## Installation
 
 ```bash
-pi install npm:@rohaquinlop/pi-deepseek-cache
+omp plugin install @ultra-omp/pi-deepseek-cache
 ```
 
-Or via git:
-
-```bash
-pi install git:github.com/rohaquinlop/pi-deepseek-cache
-```
-
-The extension activates automatically. No configuration needed. The per-session
-cache hit rate appears as a dimmed status line (`Cache 96.2%`) in Pi's footer.
-Pi's native `CH:XX.X%` shows the per-turn rate in the stats line. Detailed
-stats are available via /cache-stats and /cache-graph commands.
+The extension activates automatically through OMP's `omp.extensions` manifest entry. No configuration is needed. The per-session cache hit rate appears as a dimmed status line (`Cache 96.2%`) in OMP's footer.
+OMP's native `CH:XX.X%` shows the per-turn rate in the stats line. Detailed stats are available via `/cache-stats` and `/cache-graph`.
 
 ## Provider Support
 
@@ -77,17 +69,10 @@ extension leaves them untouched.
 
 ## Subagent Compatibility
 
-This extension automatically applies to subagent processes that use DeepSeek
-models. It declares `appliesToModels: ["deepseek-*", "deepseek"]` in its
-`package.json`, which the [pi-subagents](https://github.com/rohaquinlop/pi-subagents)
-extension detects and loads into child processes — no configuration needed.
-
-For the best cache performance, ensure both extensions are installed:
-
-```bash
-pi install npm:@rohaquinlop/pi-subagents
-pi install npm:@rohaquinlop/pi-deepseek-cache
-```
+This extension also applies to OMP subagent processes that load the installed
+plugin and use DeepSeek models. OMP discovers the extension from its package
+manifest and loads it in the active profile; no additional subagent setup is
+required.
 
 ## Commands
 

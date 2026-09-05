@@ -1,7 +1,7 @@
 /**
  * pi-reasonix — Main extension entry point.
  *
- * A pi extension that applies DeepSeek-native optimisations harvested from
+ * An OMP extension that applies DeepSeek-native optimisations harvested from
  * Reasonix (esengine/DeepSeek-Reasonix):
  *
  *   Pillar 1 — Cache-First Loop (prefix stabilisation → ~94% cache hit)
@@ -11,10 +11,9 @@
  * The extension activates automatically when the current model is a
  * DeepSeek model (deepseek-chat, deepseek-reasoner, deepseek-v4, etc.).
  *
- * Detection happens at three levels:
- *   1. Init-time: reads pi's defaultModel from settings.json
- *   2. model_select: fires when user switches model via /model
- *   3. before_provider_request: fires before each API call (fallback)
+ * Detection happens at two levels:
+ *   1. session_start: reads the active model from ExtensionContext
+ *   2. before_provider_request: fires before each API call (fallback)
  */
 
 import type {
@@ -22,7 +21,7 @@ import type {
   ExtensionCommandContext,
   BeforeProviderRequestEvent,
   TurnEndEvent,
-} from "@earendil-works/Pi-coding-agent";
+} from "@oh-my-pi/pi-coding-agent";
 import { PrefixGuard, AppendOnlyLog } from "../src/cache-first.js";
 import {
   compactToolResults,
@@ -151,71 +150,23 @@ export default async function (pi: ExtensionAPI) {
   let pendingHeaderTokens: { hit: number; miss: number } | null = null;
 
   /* ------------------------------------------------------------------ */
-  /*  Init-time detection — read pi's defaultModel from settings          */
+  /*  session_start — detect the active OMP model                        */
   /* ------------------------------------------------------------------ */
 
-  try {
-    const { readFileSync } = await import("node:fs");
-    const { homedir } = await import("node:os");
-    const { join } = await import("node:path");
-    const envDir =
-      process.env.PI_CONFIG_DIR ?? process.env.XDG_CONFIG_HOME ?? "";
-    const settingsPaths = [
-      // PI_CONFIG_DIR overrides the default location
-      envDir ? join(envDir, "settings.json") : "",
-      // Standard pi locations
-      join(homedir(), ".pi", "agent", "settings.json"),
-      join(homedir(), ".config", "pi", "agent", "settings.json"),
-      join(homedir(), ".pi", "settings.json"),
-      join(process.cwd(), ".pi", "settings.json"),
-    ].filter(Boolean);
-
-    for (const sp of settingsPaths) {
-      try {
-        const data = JSON.parse(readFileSync(sp, "utf-8"));
-        const defaultModel =
-          (data as Record<string, unknown>).defaultModel as string ?? "";
-        if (defaultModel && isDeepSeekModelId(defaultModel)) {
-          isDeepSeekSession = true;
-          currentModel = defaultModel;
-          break;
-        }
-      } catch {
-        continue;
-      }
+  pi.on("session_start", (_event, ctx) => {
+    const modelId = ctx.model?.id;
+    if (modelId) {
+      currentModel = modelId;
+      isDeepSeekSession = isDeepSeekModelId(modelId);
     }
-  } catch {
-    // Can't read settings — will detect on first API call instead.
-  }
+    if (REASONIX_CONFIG.cache) {
+      prefixGuard.reset();
+      logTracker.reset();
+      prefixHash = "";
+    }
+    pendingHeaderTokens = null;
+  });
 
-  /* ------------------------------------------------------------------ */
-  /*  model_select — detect DeepSeek when user switches models           */
-  /* ------------------------------------------------------------------ */
-
-  // model_select fires when the user changes model via /model or cycling.
-  // Not fired at extension load time — only on user-initiated changes.
-  (pi.on as (...args: unknown[]) => void)(
-    "model_select",
-    (event: Record<string, unknown>) => {
-      const modelObj = event?.model;
-      let modelId = "";
-      if (typeof modelObj === "string") {
-        modelId = modelObj;
-      } else if (modelObj && typeof modelObj === "object") {
-        modelId =
-          (modelObj as Record<string, unknown>).id as string ??
-          (modelObj as Record<string, unknown>).name as string ??
-          "";
-      }
-      if (modelId && isDeepSeekModelId(modelId)) {
-        isDeepSeekSession = true;
-        currentModel = modelId;
-      } else if (modelId) {
-        isDeepSeekSession = false;
-        currentModel = modelId;
-      }
-    },
-  );
 
   /* ------------------------------------------------------------------ */
   /*  before_provider_request — prefix stabilisation                     */
@@ -439,26 +390,11 @@ export default async function (pi: ExtensionAPI) {
   });
 
   /* ------------------------------------------------------------------ */
-  /*  session_start — reset per-session state (keep model detection)     */
-  /* ------------------------------------------------------------------ */
-
-  pi.on("session_start", () => {
-    // Keep isDeepSeekSession/currentModel across sessions.
-    // session_start fires on new/forked sessions but doesn't change the model.
-    if (REASONIX_CONFIG.cache) {
-      prefixGuard.reset();
-      logTracker.reset();
-      prefixHash = "";
-    }
-    pendingHeaderTokens = null;
-  });
-
-  /* ------------------------------------------------------------------ */
   /*  /reasonix-status command                                           */
   /* ------------------------------------------------------------------ */
 
   pi.registerCommand("reasonix-status", {
-    description: "Show pi-reasonix cache and repair stats",
+    description: "Show OMP reasonix cache and repair stats",
     handler: async (_args: string, _ctx: ExtensionCommandContext) => {
       const lines = [
         "╔══════════════════════════════════════════════╗",

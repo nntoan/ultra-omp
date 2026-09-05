@@ -11,16 +11,16 @@ import {
 } from "../lib/helpers.js";
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Simulated pi system prompt (matching real pi output)
+// Simulated OMP system prompt (matching the native OMP output)
 // ═══════════════════════════════════════════════════════════════════════════
 
 const realPiPromptEnd = `
 Current date: 2026-06-20
-Current working directory: /Users/rhafid/.pi`;
+Current working directory: /Users/rhafid/.omp`;
 
 const frozenPiPromptEnd = `
 Current date: 2026-06-20 (frozen)
-Current working directory: /Users/rhafid/.pi`;
+Current working directory: /Users/rhafid/.omp`;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // DATE_LINE_RE
@@ -88,7 +88,7 @@ describe("CWD_LINE_RE", () => {
   it("matches real pi CWD line at end of prompt", () => {
     const match = realPiPromptEnd.match(CWD_LINE_RE);
     expect(match).not.toBeNull();
-    expect(match![1]).toBe("/Users/rhafid/.pi");
+    expect(match![1]).toBe("/Users/rhafid/.omp");
   });
 
   it("matches various paths", () => {
@@ -170,7 +170,7 @@ describe("isDateFrozen", () => {
 
 describe("isCwdFrozen", () => {
   it("returns true when CWD matches expected path", () => {
-    expect(isCwdFrozen(realPiPromptEnd, "/Users/rhafid/.pi")).toBe(true);
+    expect(isCwdFrozen(realPiPromptEnd, "/Users/rhafid/.omp")).toBe(true);
   });
 
   it("returns false when CWD differs from expected path", () => {
@@ -231,7 +231,7 @@ describe("applyCwdFreeze", () => {
 
 describe("full system prompt freeze (integration)", () => {
   const sessionDate = "2026-06-20";
-  const sessionCwd = "/Users/rhafid/.pi";
+  const sessionCwd = "/Users/rhafid/.omp";
 
   it("freezes date and CWD in one pass", () => {
     const prompt = realPiPromptEnd;

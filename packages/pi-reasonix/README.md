@@ -1,13 +1,13 @@
 # pi-reasonix
 
-**DeepSeek-native optimizations, adapted as a Pi extension.**
+**DeepSeek-native optimizations, adapted as an OMP extension.**
 
-[![npm version](https://img.shields.io/npm/v/@thetrebor/pi-reasonix)](https://www.npmjs.com/package/@thetrebor/pi-reasonix)
+[![npm version](https://img.shields.io/npm/v/@ultra-omp/pi-reasonix)](https://www.npmjs.com/package/@ultra-omp/pi-reasonix)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Automatic prefix stabilization, tool-call repair, and cost control for DeepSeek models in [Pi](https://github.com/earendil-works/pi) — an AI coding agent TUI.
+Automatic prefix stabilization, tool-call repair, and cost control for DeepSeek models in [OMP](https://omp.sh).
 
-Activated whenever your Pi session uses a DeepSeek provider (`deepseek-v4-*`, `deepseek-chat`, `deepseek-reasoner`, and any model ID containing `deepseek-`). Non-DeepSeek providers pass through with zero overhead.
+Activated whenever your OMP session uses a DeepSeek provider (`deepseek-v4-*`, `deepseek-chat`, `deepseek-reasoner`, and any model ID containing `deepseek-`). Non-DeepSeek providers pass through with zero overhead.
 
 ---
 
@@ -37,7 +37,7 @@ DeepSeek's API offers **automatic disk-level prefix caching** — any byte-stabl
 
 The problem: standard AI agent TUI frameworks regenerate the conversation payload each turn, injecting fresh timestamps, reordering messages, or truncating history. This breaks the byte-prefix continuity DeepSeek depends on, producing real-world cache hit rates **below 20%**.
 
-This extension solves that by intercepting Pi's provider requests and ensuring the message payload stays byte-stable across turns — yielding observed cache hit rates of **94%+**.
+This extension solves that by intercepting OMP's provider requests and ensuring the message payload stays byte-stable across turns — yielding observed cache hit rates of **94%+**.
 
 ---
 
@@ -67,7 +67,7 @@ The three pillars of this extension are designed around these mechanics.
 
 - **Reorders messages** so the system prompt is always first (ensuring byte 0 is stable)
 - **Tracks a prefix hash** from the system prompt content + **tool definitions** (`payload.tools`) — the two things that make up DeepSeek's cache head. Tool *calls* in the history are deliberately excluded: they grow every turn, and hashing them made the stability indicator permanently red even at a 98% hit ratio.
-- **Verifies append-only ordering** — if Pi truncates conversation history (context window compaction), the check recovers its baseline so the status stays meaningful
+- **Verifies append-only ordering** — if OMP truncates conversation history (context window compaction), the check recovers its baseline so the status stays meaningful
 - **Reports stability status** via `/reasonix-status` so you can confirm the prefix is stable before expecting cache hits
 
 **Observed effect:** Cache hit ratio climbs from near-zero to ~94% after 2–3 turns with a stable prefix. On OpenCode Go (which proxies DeepSeek), one measured run showed `input_tokens: 168,112` with `cached_tokens: 164,736` — a **97.99% hit rate**.
@@ -80,7 +80,7 @@ DeepSeek's chat-completion API has known edge cases in tool-call generation that
 |---|---|
 | Tool calls emitted *inside* `<think>` reasoning blocks instead of as structured tool_calls | Scavenged via regex parsing of the reasoning content, then injected as proper tool_calls in the next request |
 | Deeply nested or wide JSON schemas (>10 parameters) causing truncation | Flattened to dot-notation keys to reduce depth and width |
-| Truncated JSON mid-structure (missing closing braces/brackets) | Auto-closed via a JSON repair parser at `message_end` — the repaired arguments are what Pi executes (same object reference the dispatcher reads) |
+| Truncated JSON mid-structure (missing closing braces/brackets) | Auto-closed via a JSON repair parser at `message_end` — the repaired arguments are what OMP executes (same object reference the dispatcher reads) |
 | Identical tool-call + argument combinations repeated back-to-back (call-storm) | Detected via content hashing; duplicated calls are suppressed from the message before execution |
 
 The repair pipeline runs at `message_end` and its counters are visible in `/reasonix-status`.
@@ -95,27 +95,25 @@ The repair pipeline runs at `message_end` and its counters are visible in `/reas
 
 ---
 
-## How it's wired into Pi
+## How it's wired into OMP
 
-This is a standard Pi extension using Pi's event system. No modifications to Pi itself are required.
+This is a standard OMP extension using OMP's event system. No modifications to OMP itself are required.
 
-| Pi Event | Extension Hook | What It Does |
+| OMP Event | Extension Hook | What It Does |
 |---|---|---|
-| `model_select` | Detects when user switches to/from a DeepSeek model | Toggles `isDeepSeekSession` flag |
+| `session_start` | Detects the active model from the OMP context and resets prefix state | Establishes model detection for the session |
 | `before_provider_request` | **Prefix stabilization** — reorders messages, computes prefix hash, compacts tool results | Returns modified payload |
-| `after_provider_response` | Header-based cache metric extraction (OpenRouter-style) | Stashes `x-cache-hit-tokens` headers (applied only if no usage arrives — no double counting) |
-| `message_end` | **Body-based cache metric extraction** + **tool-call repair** | Reads `usage.cacheRead` from AgentMessage (preferred over headers); repairs truncated args, suppresses call-storms, and (opt-in) scavenges leaked calls |
+| `after_provider_response` | Header-based cache metric extraction (OpenRouter-style) | Stashes `x-cache-hit-tokens` headers |
+| `message_end` | **Body-based cache metric extraction** + **tool-call repair** | Reads usage, repairs truncated args, suppresses call-storms, and optionally scavenges leaked calls |
 | `turn_end` | Applies stashed header tokens if no usage arrived | Also reserved for per-turn cost logging |
-| `session_start` | Resets prefix state for new conversations | Keeps model detection across sessions |
 | `/reasonix-status` (TUI command) | Displays live cache and repair statistics | Registered via `pi.registerCommand()` |
 
 ### Model detection priority
 
-1. **Init-time** — reads Pi's `defaultModel` from settings.json
-2. **User model switch** — catches `/model` commands via `model_select` event
-3. **First API call** — fallback detection from `before_provider_request` payload
+1. **Session start** — reads the active model from OMP's `ExtensionContext`
+2. **First API call** — fallback detection from `before_provider_request` payload
 
-This three-layer detection ensures the extension activates before any API call, even on first startup.
+This two-layer detection ensures the extension activates before any API call, even on first startup.
 
 ### Cache metric extraction
 
@@ -137,21 +135,18 @@ The extension is tolerant of both metric sources and never double counts:
 ## Installation
 
 ```bash
-# From npm (once published)
-pi install @thetrebor/pi-reasonix
+# From the OMP registry
+omp plugin install @ultra-omp/pi-reasonix
 
-# Or from local checkout
-pi install /path/to/pi-reasonix
-
-# Try without installing
-pi -e /path/to/pi-reasonix/extensions/index.ts
+# Or from a local checkout
+omp plugin link /path/to/ultra-omp/packages/pi-reasonix
 ```
 
 ### System requirements
 
-- Pi (any version with extension support — `@earendil-works/Pi-coding-agent`)
-- DeepSeek provider configured in Pi (`deepseek-v4-*`, `deepseek-chat`, etc.)
-- Node.js 18+ (for extension runtime)
+- OMP 18.1.10 or newer
+- A DeepSeek provider configured in OMP (`deepseek-v4-*`, `deepseek-chat`, etc.)
+- Bun, which OMP uses to load TypeScript extensions
 
 ---
 
@@ -202,20 +197,20 @@ Example output after a few turns with a stable prefix:
 | `Hit tokens` | Cumulative tokens served from DeepSeek's disk cache |
 | `Hit ratio` | Hit / (Hit + Miss) — target is 85–97% in a long session |
 | `Write tokens` | Tokens written to cache for future reuse (first turn is highest) |
-| `Truncations` | How many times Pi compacted context (doesn't affect stability) |
+| `Truncations` | How many times OMP compacted context (doesn't affect stability) |
 
 ---
 
 ## Verification
 
-On load, the extension logs to Pi's output:
+On load, the extension logs to OMP's output:
 
 ```
 [pi-reasonix] Loaded. Active for DeepSeek providers.
 [pi-reasonix] Pillars: Cache-First Loop | Tool-Call Repair | Cost Control
 ```
 
-Run `/reasonix-status` inside Pi to confirm activation and see live statistics.
+Run `/reasonix-status` inside OMP to confirm activation and see live statistics.
 
 ---
 
@@ -243,9 +238,9 @@ pi-reasonix/
 ### Key design decisions
 
 - **Standalone modules in `src/`** — the core algorithms (PrefixGuard, repair pipeline, cost control) are framework-agnostic and could power an OpenCode plugin or custom script
-- **Extension wiring in `extensions/index.ts`** — Pi-specific event registration, state management, and the `/reasonix-status` command
-- **Async factory** — the extension factory is async to allow reading Pi's settings at init time for early model detection
-- **No runtime dependencies** — the extension only imports Pi's type definitions for TypeScript safety; runtime relies on Pi's built-in event system
+- **Extension wiring in `extensions/index.ts`** — OMP event registration, state management, and the `/reasonix-status` command
+- **Session-start model detection** — reads the active model from OMP's `ExtensionContext`; request payload detection is the fallback
+- **No runtime dependencies** — the extension imports OMP's type definitions for TypeScript safety; runtime relies on OMP's built-in event system
 
 ---
 
@@ -295,18 +290,18 @@ Reasonix is a DeepSeek-native agent framework that pioneered these specific opti
 
 ### Translation process
 
-pi-reasonix is a **structural translation** of Reasonix's core algorithms into Pi's extension architecture:
+pi-reasonix is a **structural translation** of Reasonix's core algorithms into OMP's extension architecture:
 
-- The `PrefixGuard` and `AppendOnlyLog` classes in `src/cache-first.ts` mirror Reasonix's immutable prefix + append-only log with adaptations for Pi's message ordering constraints
-- The tool-call repair pipeline in `src/repair.ts` follows Reasonix's 4-pass approach (scavenge, truncation repair, flatten, storm detection) with adjustments for Pi's streaming context
-- The cost-control logic in `src/cost-control.ts` adapts Reasonix's compaction thresholds to Pi's tool-result streaming
-- Pi-specific event wiring (`extensions/index.ts`) replaces Reasonix's internal provider hooks
+- The `PrefixGuard` and `AppendOnlyLog` classes in `src/cache-first.ts` mirror Reasonix's immutable prefix + append-only log with adaptations for OMP's message ordering constraints
+- The tool-call repair pipeline in `src/repair.ts` follows Reasonix's 4-pass approach (scavenge, truncation repair, flatten, storm detection) with adjustments for OMP's streaming context
+- The cost-control logic in `src/cost-control.ts` adapts Reasonix's compaction thresholds to OMP's tool-result streaming
+- OMP-specific event wiring (`extensions/index.ts`) replaces Reasonix's internal provider hooks
 
-All 27 tests in the test suite validate that the translated algorithms preserve Reasonix's original behavior and correctness.
+All tests in the test suite validate that the translated algorithms preserve Reasonix's original behavior and correctness.
 
 ### Why not just use Reasonix directly?
 
-Reasonix is a standalone agent framework. If you're already invested in Pi's TUI, extension ecosystem, and provider system, pi-reasonix brings Reasonix's optimizations into your existing workflow without changing tools. If you don't use Pi, you should use Reasonix directly — it's the canonical implementation.
+Reasonix is a standalone agent framework. If you're already invested in OMP's TUI, extension ecosystem, and provider system, pi-reasonix brings Reasonix's optimizations into your existing workflow without changing tools. If you don't use OMP, you should use Reasonix directly — it's the canonical implementation.
 
 ### Credit
 
