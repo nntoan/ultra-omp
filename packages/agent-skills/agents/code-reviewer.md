@@ -97,6 +97,6 @@ Categorize every finding, using the same severity labels as the `code-review-and
 
 ## Composition
 
-- Invoke directly for a focused review or through `/to-review`.
-- `/ship` invokes this persona in one parallel OMP `task` batch with `security-auditor` and `test-engineer`.
-- Do not invoke another persona; orchestration belongs to commands.
+- **Invoke directly when:** the user asks for a review of a specific change, file, or PR.
+- **Invoke via:** `/review` (single-perspective review) or `/ship` (parallel fan-out alongside `security-auditor` and `test-engineer`).
+- **Do not invoke from another persona.** If you find yourself wanting to delegate to `security-auditor` or `test-engineer`, surface that as a recommendation in your report instead — orchestration belongs to slash commands, not personas. See [docs/agents.md](../docs/agents.md).

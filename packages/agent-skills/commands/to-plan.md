@@ -1,4 +1,15 @@
 ---
-description: Break approved work into small verifiable tasks with dependency ordering
+description: Break work into small verifiable tasks with acceptance criteria and dependency ordering
 ---
-For `$ARGUMENTS`, use OMP's built-in `/plan <goal>` first when plan mode is off. Never override or emulate that built-in. Then invoke `planning-and-task-breakdown`: read `SPEC.md` or the equivalent and relevant code, map component dependencies, slice work vertically, define acceptance and verification criteria, add phase checkpoints, and present the plan for review. Save the plan to `tasks/plan.md` and the task list to `tasks/todo.md`.
+Invoke the planning-and-task-breakdown skill.
+
+Read the existing spec (SPEC.md or equivalent) and the relevant codebase sections. Then:
+
+1. Enter plan mode — read only, no code changes
+2. Identify the dependency graph between components
+3. Slice work vertically (one complete path per task, not horizontal layers)
+4. Write tasks with acceptance criteria and verification steps
+5. Add checkpoints between phases
+6. Present the plan for human review
+
+Save the plan to tasks/plan.md and task list to tasks/todo.md.

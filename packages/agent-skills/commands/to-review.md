@@ -1,4 +1,15 @@
 ---
-description: Conduct a five-axis code review before merge
+description: Conduct a five-axis code review — correctness, readability, architecture, security, performance
 ---
-Invoke `code-review-and-quality` for `$ARGUMENTS`. Read the spec and tests first, then review staged or recent changes across correctness, readability, architecture, security, and performance. Use `security-and-hardening` and `performance-optimization` when relevant. Categorize findings as Critical, Important, or Suggestion and include exact file:line references, impact, and fix recommendations. Report positive observations and the verification story.
+Invoke the code-review-and-quality skill.
+
+Review the current changes (staged or recent commits) across all five axes:
+
+1. **Correctness** — Does it match the spec? Edge cases handled? Tests adequate?
+2. **Readability** — Clear names? Straightforward logic? Well-organized?
+3. **Architecture** — Follows existing patterns? Clean boundaries? Right abstraction level?
+4. **Security** — Input validated? Secrets safe? Auth checked? (Use security-and-hardening skill)
+5. **Performance** — No N+1 queries? No unbounded ops? (Use performance-optimization skill)
+
+Categorize findings as Critical, Important, or Suggestion.
+Output a structured review with specific file:line references and fix recommendations.

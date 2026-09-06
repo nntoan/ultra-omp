@@ -1,4 +1,18 @@
 ---
-description: Run TDD with failing tests, implementation, and regression verification
+description: Run TDD workflow — write failing tests, implement, verify. For bugs, use the Prove-It pattern.
 ---
-Invoke `test-driven-development` for `$ARGUMENTS`. For a feature, write behavior tests that fail, implement the minimum behavior, refactor while green, and run the full regression suite. For a bug, use Prove-It: write and confirm a failing reproduction, implement the fix, confirm it passes, then run regressions. For browser behavior, also invoke `browser-testing-with-devtools` and verify runtime output rather than relying on unit tests alone.
+Invoke the test-driven-development skill.
+
+For new features:
+1. Write tests that describe the expected behavior (they should FAIL)
+2. Implement the code to make them pass
+3. Refactor while keeping tests green
+
+For bug fixes (Prove-It pattern):
+1. Write a test that reproduces the bug (must FAIL)
+2. Confirm the test fails
+3. Implement the fix
+4. Confirm the test passes
+5. Run the full test suite for regressions
+
+For browser-related issues, also invoke browser-testing-with-devtools to verify with Chrome DevTools MCP.

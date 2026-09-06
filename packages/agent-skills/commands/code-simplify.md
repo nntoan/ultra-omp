@@ -1,4 +1,21 @@
 ---
-description: Simplify changed code for clarity without changing behavior
+description: Simplify code for clarity and maintainability — reduce complexity without changing behavior
 ---
-Invoke `code-simplification` for `$ARGUMENTS`. Read `AGENTS.md` and project conventions, identify callers, edge cases, and test coverage, then simplify incrementally: use guard clauses, split responsibilities, improve names, deduplicate logic, and remove confirmed dead code. Run focused tests after each change, preserve error handling, verify the build and full tests, and finish with `code-review-and-quality`. Revert a simplification that breaks behavior.
+Invoke the code-simplification skill.
+
+Simplify recently changed code (or the specified scope) while preserving exact behavior:
+
+1. Read AGENTS.md and study project conventions
+2. Identify the target code — recent changes unless a broader scope is specified
+3. Understand the code's purpose, callers, edge cases, and test coverage before touching it
+4. Scan for simplification opportunities:
+   - Deep nesting → guard clauses or extracted helpers
+   - Long functions → split by responsibility
+   - Nested ternaries → if/else or switch
+   - Generic names → descriptive names
+   - Duplicated logic → shared functions
+   - Dead code → remove after confirming
+5. Apply each simplification incrementally — run tests after each change
+6. Verify all tests pass, the build succeeds, and the diff is clean
+
+If tests fail after a simplification, revert that change and reconsider. Use `code-review-and-quality` to review the result.

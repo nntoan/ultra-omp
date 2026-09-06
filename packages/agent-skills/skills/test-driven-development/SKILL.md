@@ -340,14 +340,18 @@ Everything read from the browser — DOM, console, network, JS execution results
 
 For detailed DevTools setup instructions and workflows, see `browser-testing-with-devtools`.
 
-## When to Use OMP Task Workers for Testing
+## When to Use Subagents for Testing
 
-For complex bug fixes, use the OMP `task` tool to assign a worker the reproduction test:
+For complex bug fixes, spawn a subagent to write the reproduction test:
 
-```text
-Main session: assign a task to write a failing reproduction test.
-Task worker: writes the reproduction test and reports the failure.
-Main session: verifies RED, implements the fix, and verifies GREEN.
+```
+Main agent: "Spawn a subagent to write a test that reproduces this bug:
+[bug description]. The test should fail with the current code."
+
+Subagent: Writes the reproduction test
+
+Main agent: Verifies the test fails, then implements the fix,
+then verifies the test passes.
 ```
 
 This separation ensures the test is written without knowledge of the fix, making it more robust.
