@@ -62,9 +62,22 @@ Build order: identity → billing, notifications → reporting
 
 **The map is gated like every phase.** The human reviews module boundaries, dependency direction, and build order before any module spec is written. Getting the map wrong is expensive; reviewing ten lines is not.
 
-**Then recurse per module.** Run Specify → Plan → Tasks → Implement for each module in dependency order. Each module gets its own spec, scoped to that module's objective, boundaries, and success criteria. Save the approved map at the project root and each module's spec alongside it, named by module id (`SPEC-identity.md`, `SPEC-billing.md`) — the map, not filename guessing, is the index of what exists.
+**Then recurse per module.** Run Specify → Plan → Tasks → Implement for each module in dependency order. Each module gets its own spec, scoped to that module's objective, boundaries, and success criteria. Per the spec location policy, save the approved map at `docs/spec/<feature>/SPEC.md` (the feature folder is the initiative's home) and each module's spec at `docs/spec/<feature>/<module>/SPEC.md`, where `<feature>` and `<module>` are the kebab-case ids chosen above — the map, not filename guessing, is the index of what exists.
 
 ### Phase 1: Specify
+
+**Explore before asking.** Before asking anything, explore the repository so clarifying questions are limited to what exploration cannot answer:
+
+- Repository structure and the code areas this feature will touch
+- Existing code, patterns, and conventions (naming, architecture, error handling, testing)
+- Existing specs and planning artifacts — check `docs/spec/**` first, then legacy locations (`SPEC.md` at the repo root, `docs/SPEC.md`, `spec/*`) — plus docs describing the domain
+- Git state: current branch, uncommitted changes, and recent history that hints at direction
+
+State what you explored and what it told you. Then filter every would-be question:
+
+- **Evidence-answerable facts** (repo layout, existing conventions, what the code already does) — research, never ask.
+- **Preferences and tradeoffs with a defensible default** (framework choice, naming, first-slice scope) — adopt the default, record it as an assumption, and let the human correct it.
+- **Owner-decisions** (irreversible, cross-cutting, or user-facing/config surface) — ask.
 
 Start with a high-level vision. Ask the human clarifying questions until requirements are concrete.
 
@@ -147,6 +160,8 @@ Don't silently fill in ambiguous requirements. The spec's entire purpose is to s
 [Anything unresolved that needs human input]
 ```
 
+**Spec location policy.** Save the finished spec to `docs/spec/<feature>/SPEC.md` — one folder per feature, `SPEC.md` inside it; create the `docs/spec/` tree if it does not exist (`<feature>` is a kebab-case id you choose and reuse consistently). A multi-module initiative keeps its approved capability map at `docs/spec/<feature>/SPEC.md` and nests each module spec at `docs/spec/<feature>/<module>/SPEC.md`. This is the canonical location downstream commands look for first.
+
 **Reframe instructions as success criteria.** When receiving vague requirements, translate them into concrete conditions:
 
 ```
@@ -160,6 +175,12 @@ REFRAMED SUCCESS CRITERIA:
 ```
 
 This lets you loop, retry, and problem-solve toward a clear goal rather than guessing what "faster" means.
+
+**Reflection gate before approval.** Once the draft is finalized and saved to `docs/spec/<feature>/SPEC.md`, do not treat it as approved. Ask the human:
+
+> Approve the spec as-is, or send it to spec-reflector for a read-only review first?
+
+If they choose reflection, dispatch the `spec-reflector` agent to review the saved draft — it is read-only and never edits the spec (see `skills/spec-reflection/SKILL.md` and `agents/spec-reflector.md`). Reconcile its Blocking and Should Fix findings into the draft, then ask the approve-vs-reflect question again. If two reflection rounds do not converge, say so explicitly and let the human decide (ship as-is, edit manually, or get a third opinion). The spec is done only when the human has approved it.
 
 ### Phase 2: Plan
 
@@ -238,8 +259,9 @@ Before proceeding to implementation, confirm:
 
 - [ ] The spec covers all six core areas
 - [ ] The human has reviewed and approved the spec
+- [ ] The approve-vs-reflect gate was offered after the draft was finalized (the human approved as-is, or reflection findings were reconciled before re-asking)
 - [ ] Success criteria are specific and testable
 - [ ] Boundaries (Always/Ask First/Never) are defined
-- [ ] The spec is saved to a file in the repository
+- [ ] The spec is saved to `docs/spec/<feature>/SPEC.md` (nested module specs follow the spec location policy)
 - [ ] If the request bundles several independently testable capabilities, a capability map (module ids, dependency direction, build order) was approved before any module spec was written
 - [ ] Every module spec traces to a module id in the approved map

@@ -56,7 +56,7 @@ All command arguments are available to the Markdown prompt as `$ARGUMENTS`.
 
 | Command | Use it for | Main behavior |
 | --- | --- | --- |
-| `/spec <goal>` | Defining work | Clarifies users, objective, features, acceptance criteria, stack, constraints, boundaries, and testing; writes `SPEC.md`. |
+| `/spec <goal>` | Defining work | Explores the repo before asking; clarifies users, objective, features, acceptance criteria, stack, constraints, boundaries, and testing; writes `docs/spec/<feature>/SPEC.md`; ends with an approve-vs-reflect gate before the spec is done. |
 | `/to-plan <goal>` | Planning approved work | Uses OMP's built-in `/plan` when plan mode is off, then invokes `planning-and-task-breakdown`; writes `tasks/plan.md` and `tasks/todo.md`. |
 | `/build` | One implementation slice | Runs RED → GREEN → regression → build → commit for the next pending task, then stops. |
 | `/build auto` | Approved autonomous implementation | Executes the complete approved plan task-by-task with verification and isolated commits. |
@@ -77,13 +77,15 @@ OMP reserves `/plan` and its built-in `/review`. The collision-safe Agent Skills
 For a substantial feature:
 
 1. `/spec describe the outcome`
-2. Get the generated `SPEC.md` approved.
+2. Approve the generated spec at `docs/spec/<feature>/SPEC.md` — `/spec` ends with an approve-vs-reflect gate.
 3. `/to-plan describe the outcome` (or use OMP `/plan` directly when appropriate).
 4. `/build` for one task at a time, or `/build auto` after explicit approval.
 5. `/test` for behavior and regression proof.
 6. `/to-review` for the five-axis review.
 7. `/code-simplify` if the changed code can be made clearer.
 8. `/ship` for specialist release checks and the final decision.
+
+The approve-vs-reflect gate runs an optional read-only `spec-reflector` review of the draft before approval when you choose reflection. The spec-reflector model role (`@spec-reflector`) is provisioned by the ultra-omp installer (see `docs/research/openspec-spec-reflection.md`).
 
 For an incident or bug, start with the relevant reproduction and `/test`; use `debugging-and-error-recovery` when the root cause is not yet known.
 
