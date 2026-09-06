@@ -3,6 +3,7 @@ coverage/
 *.tgz
 docs/.vitepress/dist/
 docs/public/install
+docs/research/
 *.tar.gz
 
 ## Agentic
