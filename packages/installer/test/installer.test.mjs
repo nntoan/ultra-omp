@@ -20,11 +20,12 @@ function harness(overrides = {}) {
   };
 }
 
-test('catalog contains the three scoped OMP packages', () => {
+test('catalog contains the four scoped OMP extension packages', () => {
   assert.deepEqual(catalog.map(({ id, packageName }) => ({ id, packageName })), [
     { id: 'agent-skills', packageName: '@ultra-omp/agent-skills' },
     { id: 'pi-reasonix', packageName: '@ultra-omp/pi-reasonix' },
     { id: 'pi-deepseek-cache', packageName: '@ultra-omp/pi-deepseek-cache' },
+    { id: 'pi-deepseek-statusline', packageName: '@ultra-omp/pi-deepseek-statusline' },
   ]);
 });
 

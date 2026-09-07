@@ -41,6 +41,22 @@
         "@oh-my-pi/pi-tui": "*",
       },
     },
+    "packages/pi-deepseek-statusline": {
+      "name": "@ultra-omp/pi-deepseek-statusline",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@oh-my-pi/pi-ai": "*",
+        "@oh-my-pi/pi-coding-agent": "*",
+        "@oh-my-pi/pi-tui": "*",
+        "@types/node": "^22.14.0",
+        "vitest": "^3.2.0",
+      },
+      "peerDependencies": {
+        "@oh-my-pi/pi-ai": "*",
+        "@oh-my-pi/pi-coding-agent": "*",
+        "@oh-my-pi/pi-tui": "*",
+      },
+    },
     "packages/pi-reasonix": {
       "name": "@ultra-omp/pi-reasonix",
       "version": "0.1.0",
@@ -422,6 +438,8 @@
     "@ultra-omp/agent-skills": ["@ultra-omp/agent-skills@workspace:packages/agent-skills"],
 
     "@ultra-omp/pi-deepseek-cache": ["@ultra-omp/pi-deepseek-cache@workspace:packages/pi-deepseek-cache"],
+
+    "@ultra-omp/pi-deepseek-statusline": ["@ultra-omp/pi-deepseek-statusline@workspace:packages/pi-deepseek-statusline"],
 
     "@ultra-omp/pi-reasonix": ["@ultra-omp/pi-reasonix@workspace:packages/pi-reasonix"],
 

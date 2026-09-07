@@ -14,5 +14,10 @@ export const catalog = Object.freeze([
     "id": "pi-deepseek-cache",
     "packageName": "@ultra-omp/pi-deepseek-cache",
     "description": "DeepSeek prefix cache optimization for OMP — date/CWD freeze, hit-rate telemetry, cache-friendly compaction, and TUI overlays"
+  },
+  {
+    "id": "pi-deepseek-statusline",
+    "packageName": "@ultra-omp/pi-deepseek-statusline",
+    "description": "DeepSeek pricing-window / balance / session-cost status line for OMP"
   }
 ]);
