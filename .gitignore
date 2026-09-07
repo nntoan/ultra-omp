@@ -4,6 +4,7 @@ coverage/
 docs/.vitepress/dist/
 docs/public/install
 docs/research/
+tasks/
 SPEC*.md
 *.tar.gz
 
