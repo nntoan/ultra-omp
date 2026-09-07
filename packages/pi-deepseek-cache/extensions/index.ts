@@ -3,9 +3,12 @@
  *
  * Multi-layered prefix cache optimization for DeepSeek models in pi:
  *
- *   P0 — Date/CWD freeze: replaces dynamic system prompt elements with
- *        frozen values captured at session start. This is the root-cause fix
- *        that prevents daily and per-directory cache busting.
+ *   P0 — Date/CWD freeze: the harness rides a deterministic date/CWD
+ *        reminder on the first user message of each provider request
+ *        (request-time injector, #7404). This extension pins that reminder to
+ *        the first observed (date, cwd) of the session so the provider prefix
+ *        stays byte-stable across day rollovers and directory changes. The
+ *        system prompt is harness-owned and never rewritten by the extension.
  *
  *   P1 — Hit-rate telemetry: accumulates cacheRead/input/cacheWrite/turns
  *        from every assistant message. Per-session stats are stored in
@@ -65,13 +68,10 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
   isDeepSeekModel,
-  todayISO,
   calcHitRate,
   estimateSavings,
-  isDateFrozen,
-  isCwdFrozen,
-  applyDateFreeze,
-  applyCwdFreeze,
+  freezeReminder,
+  parseReminder,
   pickCacheCapableUpstream,
   openRouterEndpointsUrl,
   computeProviderPin,
@@ -700,9 +700,8 @@ export default function (pi: ExtensionAPI) {
   const hitRateHistory: HistoryPoint[] = [];
   let lastHitRate = 0;
 
-  // ────── P0: Session fingerprint ──────
-  let sessionDate = todayISO();
-  let sessionCwd = "";
+  // ────── P0: Reminder freeze state (pinned from the first observed reminder) ──────
+  let frozenReminder: { date: string; cwd: string } | undefined;
 
   // ────── P2: Prefix guard state ──────
   let lastPrefixHash: string | undefined;
@@ -740,8 +739,7 @@ export default function (pi: ExtensionAPI) {
     lastHitRate = 0;
 
     // P0
-    sessionDate = todayISO();
-    sessionCwd = ctx.cwd;
+    frozenReminder = undefined;
     lastPrefixHash = undefined;
     warnedThisTurn = false;
     prefixBreaks = 0;
@@ -759,29 +757,6 @@ export default function (pi: ExtensionAPI) {
   pi.on("session_shutdown", async (_event, ctx) => {
     flushPendingWrites(sessionId);
     if (ctx.hasUI) ctx.ui.setStatus("cache", undefined);
-  });
-
-  // ═══════════════════════════════════════════════════════════════════════
-  // P0: before_agent_start — freeze date and CWD
-  // ═══════════════════════════════════════════════════════════════════════
-
-  pi.on("before_agent_start", async (event, ctx) => {
-    setCtx(ctx);
-    if (!isDeepSeekModel(ctx.model)) return;
-
-    let prompt = event.systemPrompt;
-    let changed = false;
-
-    if (!isDateFrozen(prompt, sessionDate)) {
-      prompt = applyDateFreeze(prompt, sessionDate);
-      changed = true;
-    }
-    if (!isCwdFrozen(prompt, sessionCwd)) {
-      prompt = applyCwdFreeze(prompt, sessionCwd);
-      changed = true;
-    }
-
-    if (changed) return { systemPrompt: prompt };
   });
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -854,6 +829,32 @@ export default function (pi: ExtensionAPI) {
     };
     const msgs = payload.messages ?? [];
     if (msgs.length === 0) return;
+
+    // P0: Reminder freeze — the harness injects a deterministic date/CWD
+    // reminder on the first user message of each provider request (request-time
+    // injector, #7404). Pin the reminder to the FIRST OBSERVED (date, cwd):
+    // the harness renders its own local calendar date, and any independently
+    // computed snapshot (e.g. UTC todayISO) can mismatch it and corrupt the
+    // date. Once pinned, rewrite later reminders back to the pinned bytes so
+    // the provider prefix stays byte-stable across day rollovers and directory
+    // changes. The system prompt is harness-owned — never touched here.
+    // freezeReminder returns the same reference when nothing changes, so the
+    // common case performs no byte change at all.
+    const userMessage = msgs.find((m) => m.role === "user");
+    if (userMessage && typeof userMessage.content === "string") {
+      const parsed = parseReminder(userMessage.content);
+      if (parsed) {
+        if (!frozenReminder) frozenReminder = parsed;
+        const frozen = freezeReminder(
+          userMessage.content,
+          frozenReminder.date,
+          frozenReminder.cwd,
+        );
+        if (frozen !== userMessage.content) {
+          userMessage.content = frozen;
+        }
+      }
+    }
 
     // P5: OpenRouter auto-pin — prefix caching only hits when every request
     // lands on the same upstream. Pin the detected cache-capable upstream via

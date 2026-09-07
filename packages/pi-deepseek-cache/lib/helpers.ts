@@ -2,9 +2,9 @@
  * Pure helpers for the deepseek-cache extension.
  * Extracted for testability — no pi runtime dependencies.
  *
- * Used by the extension: isDeepSeekModel, todayISO, DATE_LINE_RE, CWD_LINE_RE,
- * calcHitRate, estimateSavings, isDateFrozen, isCwdFrozen, applyDateFreeze, applyCwdFreeze.
- * The remaining exports (frozenDate, frozenCwd) are used internally by the freeze helpers.
+ * Used by the extension: isDeepSeekModel, todayISO, calcHitRate, estimateSavings,
+ * freezeReminder. Used by the tests: REMINDER_RE, parseReminder, renderReminder,
+ * freezeReminder.
  */
 
 /**
@@ -103,62 +103,51 @@ export function estimateSavings(
 }
 
 /**
- * Matches "Current date: YYYY-MM-DD" in the system prompt.
- * Does not use $ anchor because the CWD line follows.
- * Group 1 captures the date portion.
+ * Matches the harness's request-time date/CWD reminder block at the START of a
+ * user-message string (rendered from src/prompts/system/date-cwd-reminder.md in
+ * pi-coding-agent 18.1.11 and injected as `${reminder}\n\n${content}` on the
+ * first user message of each provider request; see date-cwd-reminder.ts, #7404).
+ * The system prompt itself is harness-owned and byte-stable — the reminder is
+ * the only per-request volatile date/CWD byte.
+ *
+ * Group 1 captures the date (YYYY-MM-DD), group 2 the cwd path. `\s*` tolerates
+ * the \n line breaks of the rendered block (and \r\n if ever present).
  */
-export const DATE_LINE_RE = /Current date: (\d{4}-\d{2}-\d{2})(?: \(frozen\))?/;
+export const REMINDER_RE =
+  /^<system-reminder>\s*Today: (\d{4}-\d{2}-\d{2}); current working directory: '([^'\n]*)'\. Do not repeat this information in your reply\.\s*<\/system-reminder>/;
 
 /**
- * Matches "Current working directory: <path>" at the end of the system prompt.
- * Group 1 captures the path portion.
+ * Parse the date and cwd out of a harness reminder block.
+ * Returns undefined when the string does not START with a well-formed
+ * reminder block (no reminder present, block not at byte 0, or malformed).
  */
-export const CWD_LINE_RE = /Current working directory: (.+?)\s*$/;
-
-/**
- * Build the frozen date replacement string.
- */
-export function frozenDate(date: string): string {
-  return `Current date: ${date} (frozen)`;
+export function parseReminder(content: string): { date: string; cwd: string } | undefined {
+  const match = content.match(REMINDER_RE);
+  if (!match) return undefined;
+  return { date: match[1]!, cwd: match[2]! };
 }
 
 /**
- * Build the frozen CWD replacement string.
+ * Render a reminder block with the exact harness byte layout (trimmed form —
+ * the caller prepends `${reminder}\n\n` to the user content).
  */
-export function frozenCwd(cwd: string): string {
-  return `Current working directory: ${cwd}`;
+export function renderReminder(date: string, cwd: string): string {
+  return `<system-reminder>\nToday: ${date}; current working directory: '${cwd}'. Do not repeat this information in your reply.\n</system-reminder>`;
 }
 
 /**
- * Check if a system prompt's date line is already frozen to a given date.
+ * Freeze the reminder block in a user-message string to the given date/cwd.
+ *
+ * Returns the SAME reference when the content carries no reminder block or
+ * when the parsed (date, cwd) already equal the target — so callers detect
+ * "no byte change" cheaply with `frozen !== content`. When they differ, only
+ * the matched block at the start is replaced; everything after it is intact.
  */
-export function isDateFrozen(prompt: string, expectedDate: string): boolean {
-  const match = prompt.match(DATE_LINE_RE);
-  if (!match) return false;
-  return match[0].includes("(frozen)") && match[1] === expectedDate;
-}
-
-/**
- * Check if a system prompt's CWD line is already frozen to a given path.
- */
-export function isCwdFrozen(prompt: string, expectedCwd: string): boolean {
-  const match = prompt.match(CWD_LINE_RE);
-  if (!match) return false;
-  return match[1] === expectedCwd;
-}
-
-/**
- * Apply date freeze to a system prompt.
- */
-export function applyDateFreeze(prompt: string, date: string): string {
-  return prompt.replace(DATE_LINE_RE, frozenDate(date));
-}
-
-/**
- * Apply CWD freeze to a system prompt.
- */
-export function applyCwdFreeze(prompt: string, cwd: string): string {
-  return prompt.replace(CWD_LINE_RE, frozenCwd(cwd));
+export function freezeReminder(content: string, date: string, cwd: string): string {
+  const current = parseReminder(content);
+  if (!current) return content;
+  if (current.date === date && current.cwd === cwd) return content;
+  return content.replace(REMINDER_RE, renderReminder(date, cwd));
 }
 
 // ─── P5: OpenRouter auto-pin ────────────────────────────────────
