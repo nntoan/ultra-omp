@@ -1,0 +1,26 @@
+{
+  "name": "@ultra-omp/pi-deepseek-statusline",
+  "version": "0.1.0",
+  "description": "DeepSeek pricing-window / balance / session-cost status line for OMP",
+  "keywords": ["omp-plugin", "deepseek", "statusline", "coding-agent", "extension"],
+  "license": "MIT",
+  "author": "nntoan",
+  "repository": { "type": "git", "url": "https://github.com/nntoan/ultra-omp.git", "directory": "packages/pi-deepseek-statusline" },
+  "bugs": { "url": "https://github.com/nntoan/ultra-omp/issues" },
+  "homepage": "https://github.com/nntoan/ultra-omp/tree/main/packages/pi-deepseek-statusline",
+  "files": ["extensions/", "lib/", "README.md", "LICENSE"],
+  "omp": { "extensions": ["./extensions/index.ts"] },
+  "peerDependencies": {
+    "@oh-my-pi/pi-ai": "*",
+    "@oh-my-pi/pi-coding-agent": "*",
+    "@oh-my-pi/pi-tui": "*"
+  },
+  "scripts": { "test": "vitest run", "check": "vitest run" },
+  "devDependencies": {
+    "@oh-my-pi/pi-ai": "*",
+    "@oh-my-pi/pi-coding-agent": "*",
+    "@oh-my-pi/pi-tui": "*",
+    "@types/node": "^22.14.0",
+    "vitest": "^3.2.0"
+  }
+}
