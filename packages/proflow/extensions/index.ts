@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 
 const PREAMBLE = "proflow loaded. Use the skill discovery flowchart to find the right skill for your task.";
 
-export default function agentSkillsExtension(pi: ExtensionAPI) {
+export default function proflowExtension(pi: ExtensionAPI) {
   pi.on("session_start", async (_event, ctx) => {
     try {
       const skillPath = join(dirname(fileURLToPath(import.meta.url)), "..", "skills", "using-agent-skills", "SKILL.md");
