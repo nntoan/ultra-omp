@@ -5,7 +5,7 @@
   "license": "MIT",
   "repository": { "type": "git", "url": "https://github.com/nntoan/ultra-omp.git", "directory": "packages/installer" },
   "bugs": { "url": "https://github.com/nntoan/ultra-omp/issues" },
-  "homepage": "https://ultra-omp.nntoan.com/",
+  "homepage": "https://nntoan.com/ultra-omp/",
   "type": "module",
   "bin": { "ultra-omp": "bin/ultra-omp.mjs" },
   "files": ["bin/", "src/", "README.md", "LICENSE"],

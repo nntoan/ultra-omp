@@ -5,7 +5,7 @@
 The canonical bootstrap checks for OMP, installs it through OMP's maintained installer when needed, then runs the disposable package installer:
 
 ```sh
-curl -fsSL https://ultra-omp.nntoan.com/install | bash
+curl -fsSL https://nntoan.com/ultra-omp/install | bash
 ```
 
 The bootstrap prefers Bun when `bunx` is available and otherwise uses `npx`. It never installs the Ultra OMP installer globally.
@@ -22,7 +22,7 @@ With no flags, an interactive terminal offers all plugins or a custom selection.
 ## Automation
 
 - `--yes` installs all catalog entries without prompting.
-- `--only agent-skills,pi-reasonix` installs only the listed IDs.
+- `--only proflow,pi-reasonix` installs only the listed IDs.
 - `--local` forwards project-local scope to OMP.
 - `--dry-run` prints exact `omp plugin install` commands without launching OMP.
 - `--help` prints the complete command reference.

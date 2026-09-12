@@ -17,12 +17,12 @@ The installer selects all published plugins by default. Use `--local` for projec
 The canonical bootstrap is:
 
 ```sh
-curl -fsSL https://ultra-omp.nntoan.com/install | bash
+curl -fsSL https://nntoan.com/ultra-omp/install | bash
 ```
 
 ## Packages
 
-- [`@ultra-omp/agent-skills`](packages/agent-skills) — engineering workflow skills, lifecycle commands, and personas.
+- [`@ultra-omp/proflow`](packages/proflow) — engineering workflow skills, lifecycle commands, and personas.
 - [`@ultra-omp/pi-reasonix`](packages/pi-reasonix) — DeepSeek-native prefix stabilization, tool-call repair, and cost control.
 - [`@ultra-omp/pi-deepseek-cache`](packages/pi-deepseek-cache) — DeepSeek prefix-cache optimization and telemetry.
 - [`@nntoan/ultra-omp`](packages/installer) — disposable interactive installer for the three OMP extensions.
@@ -31,7 +31,7 @@ The installer catalog is generated from the workspace manifests; plugin package 
 
 ## Documentation
 
-The documentation site is published at [ultra-omp.nntoan.com](https://ultra-omp.nntoan.com/).
+The documentation site is published at [nntoan.com/ultra-omp](https://nntoan.com/ultra-omp/).
 
 ## Credits
 

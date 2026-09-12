@@ -32,9 +32,12 @@ jobs:
           bun-version: 1.4.0
       - run: bun install --frozen-lockfile
       - run: bun run check
-      - run: npm install --global npm@11.5.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
       - name: Publish released packages
         env:
           PATHS_RELEASED: ${{ needs.release.outputs.paths_released }}
         run: |
-          node -e 'for (const p of JSON.parse(process.env.PATHS_RELEASED)) if (/^packages\/[^/]+$/.test(p)) require("child_process").execFileSync("npm", ["publish", p, "--access", "public"], {stdio:"inherit"})'
+          node -e 'for (const p of JSON.parse(process.env.PATHS_RELEASED)) if (/^packages\/[^/]+$/.test(p)) require("child_process").execFileSync("npm", ["publish", p, "--access", "public", "--provenance"], {stdio:"inherit"})'

@@ -5,7 +5,7 @@ Ultra OMP is a native plugin suite for OMP, with an ephemeral installer that kee
 ## Install the suite
 
 ```sh
-curl -fsSL https://ultra-omp.nntoan.com/install | bash
+curl -fsSL https://nntoan.com/ultra-omp/install | bash
 ```
 
 The installer selects all published plugins by default. See [Installation](/installation) for project-local installs and automation flags.
@@ -16,4 +16,4 @@ The installer selects all published plugins by default. See [Installation](/inst
 - A disposable `npx`/`bunx` installer; no global Ultra OMP CLI.
 - A generated catalog sourced from the repository workspace manifests.
 
-Browse the [Plugins](/plugins) and [Agent Skills](/agent-skills).
+Browse the [Plugins](/plugins) and [Proflow](/agent-skills). See the [release runbook](/release-runbook) for npm publication and CI/CD operations.

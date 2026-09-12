@@ -1,4 +1,4 @@
-# @ultra-omp/agent-skills
+# @ultra-omp/proflow
 
 Production-grade engineering workflows for [Oh My Pi (OMP)](https://omp.sh). This plugin packages 25 discoverable skills, nine lifecycle commands, four specialist personas, shared engineering references, and a small session-start extension.
 
@@ -18,7 +18,7 @@ The commands are wrappers around the same skills that can be discovered directly
 Install the public plugin:
 
 ```sh
-omp plugin install @ultra-omp/agent-skills
+omp plugin install @ultra-omp/proflow
 ```
 
 Restart OMP after installation, or reload plugins in an existing session:
@@ -30,7 +30,7 @@ Restart OMP after installation, or reload plugins in an existing session:
 Upgrade the installed package with OMP's normal plugin upgrade flow, then reload plugins. A linked development checkout can be loaded without publishing:
 
 ```sh
-omp plugin link /absolute/path/to/ultra-omp/packages/agent-skills
+omp plugin link /absolute/path/to/ultra-omp/packages/proflow
 ```
 
 After editing a linked checkout, run `/reload-plugins`. Confirm discovery with OMP's plugin list command and by checking that the command names below are available.
@@ -199,9 +199,9 @@ From the repository root:
 
 ```sh
 bun install --frozen-lockfile
-bun --filter @ultra-omp/agent-skills test
-bun --filter @ultra-omp/agent-skills check
-npm pack --dry-run --workspace @ultra-omp/agent-skills
+bun --filter @ultra-omp/proflow test
+bun --filter @ultra-omp/proflow check
+npm pack --dry-run --workspace @ultra-omp/proflow
 ```
 
 The package tests cover session-start registration/message delivery and the exact nine-command catalog. The retained skill-lint unit tests run with Bun's test runner and protect frontmatter, sections, exemptions, and cross-skill references. The validator reports the expected 25 skill directories.

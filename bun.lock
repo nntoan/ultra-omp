@@ -8,13 +8,6 @@
         "vitepress": "^1.6.4",
       },
     },
-    "packages/agent-skills": {
-      "name": "@ultra-omp/agent-skills",
-      "version": "0.1.0",
-      "peerDependencies": {
-        "@oh-my-pi/pi-coding-agent": "*",
-      },
-    },
     "packages/installer": {
       "name": "@nntoan/ultra-omp",
       "version": "0.1.0",
@@ -49,6 +42,13 @@
         "@types/node": "^22.14.0",
         "typescript": "^5.7.0",
       },
+      "peerDependencies": {
+        "@oh-my-pi/pi-coding-agent": "*",
+      },
+    },
+    "packages/proflow": {
+      "name": "@ultra-omp/proflow",
+      "version": "0.1.0",
       "peerDependencies": {
         "@oh-my-pi/pi-coding-agent": "*",
       },
@@ -419,11 +419,11 @@
 
     "@types/web-bluetooth": ["@types/web-bluetooth@0.0.21", "", {}, "sha512-oIQLCGWtcFZy2JW77j9k8nHzAOpqMHLQejDA48XXMWH6tjCQHz5RCFz1bzsmROyL6PUm+LLnUiI4BCn221inxA=="],
 
-    "@ultra-omp/agent-skills": ["@ultra-omp/agent-skills@workspace:packages/agent-skills"],
-
     "@ultra-omp/pi-deepseek-cache": ["@ultra-omp/pi-deepseek-cache@workspace:packages/pi-deepseek-cache"],
 
     "@ultra-omp/pi-reasonix": ["@ultra-omp/pi-reasonix@workspace:packages/pi-reasonix"],
+
+    "@ultra-omp/proflow": ["@ultra-omp/proflow@workspace:packages/proflow"],
 
     "@ungap/structured-clone": ["@ungap/structured-clone@1.4.0", "", {}, "sha512-1mEZtMKPM09vDmQt5y7YvmN2+DFTP7Tg0EWXdic8/C6VRnpb33e4ghisCIE3WZjsE2N8mf+QV1Zqh7ZFYLWInQ=="],
 
