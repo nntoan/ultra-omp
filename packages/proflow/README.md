@@ -39,7 +39,7 @@ After editing a linked checkout, run `/reload-plugins`. Confirm discovery with O
 
 The extension registers one `session_start` handler. It reads `skills/using-agent-skills/SKILL.md` relative to the installed extension, prepends:
 
-> agent-skills loaded. Use the skill discovery flowchart to find the right skill for your task.
+> proflow loaded. Use the skill discovery flowchart to find the right skill for your task.
 
 and queues the complete message for the next turn with `deliverAs: "nextTurn"` and `triggerTurn: false`.
 

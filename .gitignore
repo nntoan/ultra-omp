@@ -5,6 +5,7 @@ docs/.vitepress/dist/
 docs/public/install
 docs/research/
 SPEC*.md
+!packages/proflow/commands/spec.md
 *.tar.gz
 
 ## Agentic

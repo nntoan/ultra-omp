@@ -16,4 +16,4 @@ The installer selects all published plugins by default. See [Installation](/inst
 - A disposable `npx`/`bunx` installer; no global Ultra OMP CLI.
 - A generated catalog sourced from the repository workspace manifests.
 
-Browse the [Plugins](/plugins) and [Proflow](/agent-skills). See the [release runbook](/release-runbook) for npm publication and CI/CD operations.
+Browse the [Plugins](/plugins) and [Proflow](/proflow). See the [release runbook](/release-runbook) for npm publication and CI/CD operations.

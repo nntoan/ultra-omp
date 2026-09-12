@@ -14,13 +14,13 @@ export default defineConfig({
       { text: 'Overview', link: '/' },
       { text: 'Installation', link: '/installation' },
       { text: 'Plugins', link: '/plugins' },
-      { text: 'Proflow', link: '/agent-skills' }
+      { text: 'Proflow', link: '/proflow' }
     ],
     sidebar: [
       { text: 'Overview', link: '/' },
       { text: 'Installation', link: '/installation' },
       { text: 'Plugins', link: '/plugins' },
-      { text: 'Proflow', link: '/agent-skills' },
+      { text: 'Proflow', link: '/proflow' },
       { text: 'Release runbook', link: '/release-runbook' }
     ],
     editLink: { pattern: 'https://github.com/nntoan/ultra-omp/edit/main/docs/:path' },

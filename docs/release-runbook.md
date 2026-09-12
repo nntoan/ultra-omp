@@ -47,6 +47,41 @@ npm view @nntoan/ultra-omp version
 
 The old `@ultra-omp/agent-skills` name is not the published package name after this migration. Update consumers to `@ultra-omp/proflow` and installer selections to `proflow`.
 
+## Bootstrap the release baseline
+
+After the four initial publishes succeed, commit the already-published `0.1.0`
+versions into `.release-please-manifest.json` before allowing future Release
+Please runs to publish. The repository baseline must contain:
+
+```json
+{
+  "packages/proflow": "0.1.0",
+  "packages/pi-reasonix": "0.1.0",
+  "packages/pi-deepseek-cache": "0.1.0",
+  "packages/installer": "0.1.0"
+}
+```
+
+Create matching initial tags and GitHub releases. The configured
+`include-component-in-tag` setting uses these tag names:
+
+```sh
+git tag proflow-v0.1.0
+git tag pi-reasonix-v0.1.0
+git tag pi-deepseek-cache-v0.1.0
+git tag ultra-omp-v0.1.0
+git push origin proflow-v0.1.0 pi-reasonix-v0.1.0 pi-deepseek-cache-v0.1.0 ultra-omp-v0.1.0
+
+gh release create proflow-v0.1.0 --title "proflow v0.1.0" --generate-notes
+gh release create pi-reasonix-v0.1.0 --title "pi-reasonix v0.1.0" --generate-notes
+gh release create pi-deepseek-cache-v0.1.0 --title "pi-deepseek-cache v0.1.0" --generate-notes
+gh release create ultra-omp-v0.1.0 --title "ultra-omp v0.1.0" --generate-notes
+```
+
+Commit the manifest baseline and tags before merging unrelated release
+changes. This prevents Release Please from attempting to republish an
+already-existing `0.1.0` version.
+
 ## Configure npm trusted publishing
 
 The release workflow uses GitHub Actions OIDC and `npm publish --provenance`; it does not use a long-lived `NPM_TOKEN`.
@@ -86,7 +121,6 @@ npm view @nntoan/ultra-omp version
 ```
 
 For a package release, inspect the published file list without installing it into the workspace:
-
 ```sh
 npm pack @ultra-omp/proflow --dry-run
 ```
@@ -95,7 +129,7 @@ If publishing fails, do not rerun with a different authentication mechanism with
 
 ## Pages deployment
 
-The documentation is a project site at `https://nntoan.com/ultra-omp/`. Do not configure a repository CNAME or a custom domain: the apex domain is already bound to another GitHub Pages repository.
+The documentation is a project site at `https://nntoan.com/ultra-omp/`. The existing apex-domain Pages routing is retained because it serves the requested project URL; do not add a second repository CNAME or change the account-level domain binding. The committed artifact has no `CNAME` file.
 
 The Pages workflow builds with `bun run docs:build`, uploads the VitePress artifact, and deploys through the `github-pages` environment. Its VitePress base is `/ultra-omp/`, and the bootstrap endpoint is:
 
