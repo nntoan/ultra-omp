@@ -1,16 +1,38 @@
 {
   "name": "@nntoan/ultra-omp",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Interactive installer for the Ultra OMP plugin suite",
   "license": "MIT",
-  "repository": { "type": "git", "url": "https://github.com/nntoan/ultra-omp.git", "directory": "packages/installer" },
-  "bugs": { "url": "https://github.com/nntoan/ultra-omp/issues" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nntoan/ultra-omp.git",
+    "directory": "packages/installer"
+  },
+  "bugs": {
+    "url": "https://github.com/nntoan/ultra-omp/issues"
+  },
   "homepage": "https://nntoan.com/ultra-omp/",
   "type": "module",
-  "bin": { "ultra-omp": "bin/ultra-omp.mjs" },
-  "files": ["bin/", "src/", "README.md", "LICENSE"],
-  "engines": { "node": ">=22" },
-  "publishConfig": { "access": "public" },
-  "scripts": { "test": "node --test test/*.test.mjs", "check": "node --test test/*.test.mjs" },
-  "dependencies": { "@clack/prompts": "^0.11.0" }
+  "bin": {
+    "ultra-omp": "bin/ultra-omp.mjs"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.11.0"
+  }
 }

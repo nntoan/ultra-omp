@@ -1,21 +1,46 @@
 {
   "name": "@ultra-omp/pi-deepseek-cache",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "DeepSeek prefix cache optimization for OMP — date/CWD freeze, hit-rate telemetry, cache-friendly compaction, and TUI overlays",
-  "keywords": ["omp-plugin", "deepseek", "cache", "prefix-cache", "coding-agent", "extension"],
+  "keywords": [
+    "omp-plugin",
+    "deepseek",
+    "cache",
+    "prefix-cache",
+    "coding-agent",
+    "extension"
+  ],
   "license": "MIT",
   "author": "rohaquinlop",
-  "repository": { "type": "git", "url": "https://github.com/nntoan/ultra-omp.git", "directory": "packages/pi-deepseek-cache" },
-  "bugs": { "url": "https://github.com/nntoan/ultra-omp/issues" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nntoan/ultra-omp.git",
+    "directory": "packages/pi-deepseek-cache"
+  },
+  "bugs": {
+    "url": "https://github.com/nntoan/ultra-omp/issues"
+  },
   "homepage": "https://github.com/nntoan/ultra-omp/tree/main/packages/pi-deepseek-cache",
-  "files": ["extensions/", "lib/", "README.md", "LICENSE"],
-  "omp": { "extensions": ["./extensions/index.ts"] },
+  "files": [
+    "extensions/",
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
+  "omp": {
+    "extensions": [
+      "./extensions/index.ts"
+    ]
+  },
   "peerDependencies": {
     "@oh-my-pi/pi-ai": "*",
     "@oh-my-pi/pi-coding-agent": "*",
     "@oh-my-pi/pi-tui": "*"
   },
-  "scripts": { "test": "vitest run", "check": "vitest run" },
+  "scripts": {
+    "test": "vitest run",
+    "check": "vitest run"
+  },
   "devDependencies": {
     "@oh-my-pi/pi-ai": "*",
     "@oh-my-pi/pi-coding-agent": "*",
