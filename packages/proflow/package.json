@@ -1,15 +1,40 @@
 {
   "name": "@ultra-omp/proflow",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Native OMP engineering workflow skills, lifecycle commands, and personas",
   "license": "MIT",
-  "repository": { "type": "git", "url": "https://github.com/nntoan/ultra-omp.git", "directory": "packages/proflow" },
-  "bugs": { "url": "https://github.com/nntoan/ultra-omp/issues" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nntoan/ultra-omp.git",
+    "directory": "packages/proflow"
+  },
+  "bugs": {
+    "url": "https://github.com/nntoan/ultra-omp/issues"
+  },
   "homepage": "https://github.com/nntoan/ultra-omp/tree/main/packages/proflow",
   "type": "module",
-  "scripts": { "test": "bun test test && bun test ./scripts/lib/skill-lint-test.js", "check": "bun test test && bun test ./scripts/lib/skill-lint-test.js && bun scripts/validate-skills.js" },
-  "publishConfig": { "access": "public" },
-  "omp": { "extensions": ["./extensions/index.ts"] },
-  "peerDependencies": { "@oh-my-pi/pi-coding-agent": "*" },
-  "files": ["extensions/", "skills/", "commands/", "agents/", "references/", "README.md", "LICENSE"]
+  "scripts": {
+    "test": "bun test test && bun test ./scripts/lib/skill-lint-test.js",
+    "check": "bun test test && bun test ./scripts/lib/skill-lint-test.js && bun scripts/validate-skills.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "omp": {
+    "extensions": [
+      "./extensions/index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "@oh-my-pi/pi-coding-agent": "*"
+  },
+  "files": [
+    "extensions/",
+    "skills/",
+    "commands/",
+    "agents/",
+    "references/",
+    "README.md",
+    "LICENSE"
+  ]
 }
